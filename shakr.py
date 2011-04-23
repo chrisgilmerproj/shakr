@@ -25,26 +25,36 @@ if __name__ == '__main__':
 	events = {}
 
 	while 1:
+		# Parse the USGS Feed
 		feed = feedparser.parse(USGS)
 		if len(feed.entries):
 			for entry in feed.entries:
+				# Pull out the title and summary
 				title = entry.title
 				summary = entry.summary
 				
+				# Only notify if summary not in keys
 				if summary not in events.keys():
 					print title, summary 
 					# Get the magnitude from the feed
-					mag = title.split(',')[0].split()[1]
-					val = float(mag)
+					
+					mag = float(title.split(',')[0].split()[1])
 	
-					# Pack up the value for sending
-					packed = struct.pack('f', val)
+					# Pack up the value and send it
+					packed = struct.pack('f', mag)
 					#print val, binascii.hexlify(packed)
 					ser.write(packed)
-					time.sleep(val)
+
+					# Delay before next notification
+					time.sleep(10)
 	
 					# Confirm that value was received
-					print ser.readline()
+					confirm = ser.readline()
+
+					# Add this event to the dictionary
 					events[summary] = title
-			pprint.pprint(events)
-		time.sleep(30)	
+			#pprint.pprint(events)
+		
+		# Wait 30 seconds for update
+		time.sleep(30)
+
