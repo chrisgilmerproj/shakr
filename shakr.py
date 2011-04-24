@@ -86,6 +86,13 @@ if __name__ == '__main__':
 			print 'Port not found, please connect device or set before running'
 			sys.exit()
 
+	if DEBUG:
+		print 'PORT %s' % PORT
+		print 'BAUD %s' % BAUD
+		print 'TIMEOUT %s' % TIMEOUT
+		print 'THRESHOLD %s' % THRESHOLD
+		print 'ZONE %s' % ZONE
+		
 	# Connect to serial port and wait for arduino reboot and startup
 	try:
 		ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
@@ -99,8 +106,13 @@ if __name__ == '__main__':
 	while 1:
 		# Parse the USGS Feed
 		feed = feedparser.parse(USGS_1h_M0)
+		
+		if DEBUG: pprint.pprint(events)
+		
 		if len(feed.entries):
 			for entry in feed.entries:
+				if DEBUG: pprint.pprint(entry)
+
 				# Pull out the title and summary
 				title = entry.title
 				summary = entry.summary
@@ -120,8 +132,7 @@ if __name__ == '__main__':
 						
 						# Pack up the value and send it
 						packed = struct.pack('f', mag)
-						if DEBUG:
-							print mag, binascii.hexlify(packed)
+						if DEBUG: print mag, binascii.hexlify(packed)
 
 						try:
 							ser.write(packed)
@@ -132,7 +143,8 @@ if __name__ == '__main__':
 	
 							# Confirm that value was received
 							confirm = ser.readline()
-							
+							if DEBUG: print confirm
+
 							# If confirmed then add this event to the dictionary
 							if confirm:
 								events[event_time] = title
@@ -141,8 +153,6 @@ if __name__ == '__main__':
 							print e
 					else:
 						events[event_time] = title
-		if DEBUG:
-			pprint.pprint(events)
 		
 		# Wait 30 seconds for update
 		time.sleep(30)
