@@ -31,7 +31,6 @@ void setup()
   
   BlinkM_begin();
   BlinkM_stopScript(blinkm_addr);
-  //BlinkM_setFadeSpeed(blinkm_addr, 255);
   BlinkM_setRGB(blinkm_addr, 0x00,0x00,0x00);
 }
 
