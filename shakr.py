@@ -1,6 +1,6 @@
 #! /opt/local/bin/python
 
-import binascii, feedparser, glob, pprint, serial, struct, time
+import binascii, feedparser, glob, pprint, serial, struct, sys, time
 
 USGS = 'http://earthquake.usgs.gov/earthquakes/catalogs/eqs1hour-M0.xml'
 
@@ -12,6 +12,9 @@ if __name__ == '__main__':
 	BAUD = 19200
 	TIMEOUT = 1
 
+	THRESHOLD = 0.0
+	DEBUG = False
+
 	# Scan the ports if none given
 	if not PORT:
 		for port in scanports():
@@ -19,8 +22,11 @@ if __name__ == '__main__':
 				PORT = port
 
 	# Connect to serial port and wait for arduino reboot
-	ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
-	time.sleep(1.5)
+	try:
+		ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
+		time.sleep(1.5)
+	except:
+		sys.exit()
 
 	events = {}
 
@@ -39,21 +45,23 @@ if __name__ == '__main__':
 					# Get the magnitude from the feed
 					
 					mag = float(title.split(',')[0].split()[1])
-	
-					# Pack up the value and send it
-					packed = struct.pack('f', mag)
-					#print val, binascii.hexlify(packed)
-					ser.write(packed)
+					if mag >= THRESHOLD:
+						# Pack up the value and send it
+						packed = struct.pack('f', mag)
+						if DEBUG:
+							print val, binascii.hexlify(packed)
+						ser.write(packed)
 
-					# Delay before next notification
-					time.sleep(10)
+						# Delay before next notification
+						time.sleep(5)
 	
-					# Confirm that value was received
-					confirm = ser.readline()
-
-					# Add this event to the dictionary
-					events[summary] = title
-			#pprint.pprint(events)
+						# Confirm that value was received
+						confirm = ser.readline()
+						if confirm:
+							# Add this event to the dictionary
+							events[summary] = title
+		if DEBUG:
+			pprint.pprint(events)
 		
 		# Wait 30 seconds for update
 		time.sleep(30)
