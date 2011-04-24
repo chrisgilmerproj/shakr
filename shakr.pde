@@ -1,4 +1,8 @@
-#include <Wire.h>
+
+#include "Wire.h"
+#include "BlinkM_funcs.h"
+
+byte blinkm_addr = 0x09;
 
 //--- Define the output pins
 int vibPin = 12;
@@ -24,33 +28,26 @@ void setup()
   pinMode(ledPin, OUTPUT);
   digitalWrite(vibPin, LOW);
   digitalWrite(ledPin, LOW);
-
-  //set up I2C
-  Wire.begin();
-  //join I2C, talk to BlinkM 0x09
-  Wire.beginTransmission(0x09);
-  //'f' == fade to color
-  Wire.send('f');
-  //value for red channel
-  Wire.send(0xff);
-  //value for blue channel
-  Wire.send(0x00);
-  //value for green channel
-  Wire.send(0x00);
-  //leave I2C bus
-  Wire.endTransmission();
+  
+  BlinkM_begin();
+  BlinkM_stopScript(blinkm_addr);
+  //BlinkM_setFadeSpeed(blinkm_addr, 255);
+  BlinkM_setRGB(blinkm_addr, 0x00,0x00,0x00);
 }
 
 void loop()
 {
+  
   if(Serial.available() == 4)
   {
     float val = readFloatFromBytes();
     digitalWrite(vibPin, HIGH);
     digitalWrite(ledPin, HIGH);
+    BlinkM_setRGB(blinkm_addr, 0xff,0x00,0x00);
     delay(int(val*1000));
     digitalWrite(vibPin, LOW);
     digitalWrite(ledPin, LOW);
+    BlinkM_setRGB(blinkm_addr, 0x00,0x00,0x00);
     Serial.println(val); // send to python to check
   }
 }
