@@ -55,6 +55,12 @@ if __name__ == '__main__':
                       type="float",
 					  help="the notification magnitude THRESHOLD limit [default: %default]",
                       metavar="THRESHOLD")
+	parser.add_option("-z", "--zone",
+                      dest="zone",
+                      default=-7,
+                      type="int",
+					  help="the local time ZONE offset in hours from GMT [default: %default]",
+                      metavar="ZONE")
 	parser.add_option("-d", "--debug",
                       action="store_true",
                       dest="debug",
@@ -67,6 +73,7 @@ if __name__ == '__main__':
 	BAUD      = options.baud
 	TIMEOUT   = options.timeout
 	THRESHOLD = options.limit
+	ZONE      = options.zone
 	DEBUG     = options.debug
 
 	# Scan the ports if none given
@@ -100,10 +107,11 @@ if __name__ == '__main__':
 
 				# Get the event time
 				event_time = datetime.datetime.strptime(summary,'%B %d, %Y %H:%M:%S %Z')
+				event_local_time = event_time+datetime.timedelta(hours=ZONE)
 				
 				# Only notify if summary not in keys
-				if summary not in events.keys():
-					print title, summary 
+				if event_time not in events.keys():
+					print event_local_time.strftime('%Y-%m-%d %H:%M:%S'),title  
 					# Get the magnitude from the feed
 					
 					mag = float(title.split(',')[0].split()[1])
@@ -123,7 +131,7 @@ if __name__ == '__main__':
 						
 						# If confirmed then add this event to the dictionary
 						if confirm:
-							events[summary] = title
+							events[event_time] = title
 		if DEBUG:
 			pprint.pprint(events)
 		
