@@ -1,6 +1,15 @@
 #! /opt/local/bin/python
 
-import binascii, feedparser, glob, pprint, serial, struct, sys, time
+import binascii
+import datetime
+import feedparser
+import glob
+import optparse
+import pprint
+import serial
+import struct
+import sys
+import time
 
 # USGS Earthquake Feeds
 USGS_1h_M1  = 'http://earthquake.usgs.gov/earthquakes/catalogs/eqs1hour-M1.xml'
@@ -17,24 +26,64 @@ def scanports():
 	return glob.glob('/dev/tty*')
 
 if __name__ == '__main__':
-	PORT = None #'/dev/tty.usbserial-A9007PVR'
-	BAUD = 19200
-	TIMEOUT = 1
 
-	THRESHOLD = 0.0
-	DEBUG = False
+	usage = 'usage: shakr [options]'
+	parser = optparse.OptionParser(usage=usage)
+
+	parser.add_option("-p", "--port",
+                      dest="port",
+                      default = None,
+                      type="string",
+                      help="the serial connection port [default: %default]",
+                      metavar="PORT")
+	parser.add_option("-b", "--baud",
+                      dest="baud",
+                      default=19200,
+                      type="int",
+                      help="the serial connection BAUD rate [default: %default]",
+                      metavar="BAUD")
+	parser.add_option("-t", "--timeout",
+                      dest="timeout",
+                      default=15,
+                      type="int",
+                      help="the serial connection TIMEOUT in seconds [default: %default]",
+                      metavar="TIMEOUT")
+	parser.add_option("-l", "--limit",
+                      dest="limit",
+                      default=0.0,
+                      type="float",
+					  help="the notification magnitude THRESHOLD limit [default: %default]",
+                      metavar="THRESHOLD")
+	parser.add_option("-d", "--debug",
+                      action="store_true",
+                      dest="debug",
+                      default=False,
+					  help="the debug setting to print more information [default: %default]")
+	(options, args) = parser.parse_args()
+	
+	# Set up the options
+	PORT      = options.port 
+	BAUD      = options.baud
+	TIMEOUT   = options.timeout
+	THRESHOLD = options.limit
+	DEBUG     = options.debug
 
 	# Scan the ports if none given
 	if not PORT:
 		for port in scanports():
 			if 'usbserial' in port:
 				PORT = port
+				break
+		if not PORT:
+			print 'Port not found, please connect device or set before running'
+			sys.exit()
 
 	# Connect to serial port and wait for arduino reboot
 	try:
 		ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
 		time.sleep(1.5)
-	except:
+	except e:
+		print 'Serial connection could not be established:\n',e
 		sys.exit()
 
 	events = {}
@@ -47,6 +96,9 @@ if __name__ == '__main__':
 				# Pull out the title and summary
 				title = entry.title
 				summary = entry.summary
+
+				# Get the event time
+				event_time = datetime.datetime.strptime(summary,'%B %d, %Y %H:%M:%S %Z')
 				
 				# Only notify if summary not in keys
 				if summary not in events.keys():
@@ -67,8 +119,9 @@ if __name__ == '__main__':
 	
 						# Confirm that value was received
 						confirm = ser.readline()
+						
+						# If confirmed then add this event to the dictionary
 						if confirm:
-							# Add this event to the dictionary
 							events[summary] = title
 		if DEBUG:
 			pprint.pprint(events)
