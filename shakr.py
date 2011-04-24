@@ -86,10 +86,10 @@ if __name__ == '__main__':
 			print 'Port not found, please connect device or set before running'
 			sys.exit()
 
-	# Connect to serial port and wait for arduino reboot
+	# Connect to serial port and wait for arduino reboot and startup
 	try:
 		ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
-		time.sleep(1.5)
+		time.sleep(5.0)
 	except serial.SerialException, e:
 		print 'Serial connection could not be established:\n\t',e
 		sys.exit()
@@ -111,11 +111,13 @@ if __name__ == '__main__':
 				
 				# Only notify if summary not in keys
 				if event_time not in events.keys():
-					print event_local_time.strftime('%Y-%m-%d %H:%M:%S'),title  
 					# Get the magnitude from the feed
-					
 					mag = float(title.split(',')[0].split()[1])
+					
+					# Only process items above the THRESHOLD
 					if mag >= THRESHOLD:
+						print event_local_time.strftime('%Y-%m-%d %H:%M:%S'),title  
+						
 						# Pack up the value and send it
 						packed = struct.pack('f', mag)
 						if DEBUG:
@@ -132,6 +134,8 @@ if __name__ == '__main__':
 						# If confirmed then add this event to the dictionary
 						if confirm:
 							events[event_time] = title
+					else:
+						events[event_time] = title
 		if DEBUG:
 			pprint.pprint(events)
 		
