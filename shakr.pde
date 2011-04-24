@@ -1,4 +1,3 @@
-
 #include "Wire.h"
 #include "BlinkM_funcs.h"
 
@@ -69,8 +68,6 @@ void setup()
   // Initialize the output pins
   pinMode(vibPin, OUTPUT);
   pinMode(ledPin, OUTPUT);
-  digitalWrite(vibPin, LOW);
-  digitalWrite(ledPin, LOW);
   
   // Initialize the BlinkM
   BlinkM_beginWithPower();
@@ -82,6 +79,14 @@ void setup()
     BlinkM_setRGB(blinkm_addr, r, g, b);
     delay(200);
   }
+  // Vibration Startup
+  digitalWrite(vibPin, HIGH);
+  digitalWrite(ledPin, HIGH);
+  delay(500);
+  
+  // End setup
+  digitalWrite(vibPin, LOW);
+  digitalWrite(ledPin, LOW);
   setColor(0.0);
   BlinkM_setRGB(blinkm_addr, r, g, b);
 }
