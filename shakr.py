@@ -2,14 +2,15 @@
 
 import binascii
 import datetime
-import feedparser
 import glob
 import optparse
 import pprint
-import serial
 import struct
 import sys
 import time
+
+import feedparser
+import serial
 
 # USGS Earthquake Feeds
 USGS_1h_M1  = 'http://earthquake.usgs.gov/earthquakes/catalogs/eqs1hour-M1.xml'
