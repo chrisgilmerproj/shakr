@@ -121,19 +121,24 @@ if __name__ == '__main__':
 						# Pack up the value and send it
 						packed = struct.pack('f', mag)
 						if DEBUG:
-							print val, binascii.hexlify(packed)
-						ser.write(packed)
+							print mag, binascii.hexlify(packed)
 
-						# Delay before next notification
-						time.sleep(mag)
-						time.sleep(5)
+						try:
+							ser.write(packed)
+
+							# Delay before next notification
+							time.sleep(mag)
+							time.sleep(5)
 	
-						# Confirm that value was received
-						confirm = ser.readline()
-						
-						# If confirmed then add this event to the dictionary
-						if confirm:
-							events[event_time] = title
+							# Confirm that value was received
+							confirm = ser.readline()
+							
+							# If confirmed then add this event to the dictionary
+							if confirm:
+								events[event_time] = title
+
+						except Exception, e:
+							print e
 					else:
 						events[event_time] = title
 		if DEBUG:
