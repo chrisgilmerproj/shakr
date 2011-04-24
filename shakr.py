@@ -116,6 +116,8 @@ if __name__ == '__main__':
 				# Pull out the title and summary
 				title = entry.title
 				summary = entry.summary
+				geo_lat = entry.geo_lat
+				geo_long = entry.geo_long
 
 				# Get the event time
 				event_time = datetime.datetime.strptime(summary,'%B %d, %Y %H:%M:%S %Z')
@@ -128,7 +130,9 @@ if __name__ == '__main__':
 					
 					# Only process items above the THRESHOLD
 					if mag >= THRESHOLD:
-						print event_local_time.strftime('%Y-%m-%d %H:%M:%S'),title  
+						print 'At %s, (%s,%s), %s' % (
+								event_local_time.strftime('%Y-%m-%d %H:%M:%S'),
+								geo_lat,geo_long, title)  
 						
 						# Pack up the value and send it
 						packed = struct.pack('f', mag)
