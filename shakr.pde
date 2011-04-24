@@ -29,7 +29,7 @@ void setup()
   digitalWrite(vibPin, LOW);
   digitalWrite(ledPin, LOW);
   
-  BlinkM_begin();
+  BlinkM_beginWithPower();
   BlinkM_stopScript(blinkm_addr);
   BlinkM_setRGB(blinkm_addr, 0x00,0x00,0x00);
 }
