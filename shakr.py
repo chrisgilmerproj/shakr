@@ -62,6 +62,7 @@ if __name__ == '__main__':
 						ser.write(packed)
 
 						# Delay before next notification
+						time.sleep(mag)
 						time.sleep(5)
 	
 						# Confirm that value was received
