@@ -82,8 +82,8 @@ if __name__ == '__main__':
 	try:
 		ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
 		time.sleep(1.5)
-	except e:
-		print 'Serial connection could not be established:\n',e
+	except serial.SerialException, e:
+		print 'Serial connection could not be established:\n\t',e
 		sys.exit()
 
 	events = {}
