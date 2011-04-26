@@ -25,9 +25,16 @@ float readFloatFromBytes() {
 //--- Set colors based on a given value
 void setColor(float val)
 {
-  h = int(170.0 - val/10.0 * 170.0);
-  s = 0xff;
-  b = 0xff;
+  // Hue is a number between 0.0 and 360.0
+  // BlinkM takes color values from 0 to 255
+  // We want colors to start at Blue and go to Red
+  // Red is 0 and Blue is 240/360*255 = 170.
+  // Because we want lower magnitude to be Blue
+  // and the higher magnitude to be Red we must
+  // reverse the values.  Thus the following equation.
+  h = int(170.0 - val/9.0 * 170.0);
+  s = 0xff; // Full Saturation
+  b = 0xff; // Full Brightness
 }
 
 //--- Set the shakr
@@ -63,13 +70,13 @@ void setup()
   BlinkM_stopScript(blinkm_addr);
   
   // Color Startup
-  for(float i = 0; i <= 10.0; ++i){
+  for(float i = 0.0; i <= 9.0; i=i+0.01){
     setColor(i);
     BlinkM_fadeToHSB(blinkm_addr, h, s, b);
-    delay(200);
+    delay(2);
   }
   
-  // Vibration Startup
+  // Startup Test
   shake(0.5);
 }
 
