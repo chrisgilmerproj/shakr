@@ -32,7 +32,7 @@ void setColor(float val)
   // Because we want lower magnitude to be Blue
   // and the higher magnitude to be Red we must
   // reverse the values.  Thus the following equation.
-  h = int(170.0 - val/9.0 * 170.0);
+  h = int(170.0 * (1.0 - val/9.0));
   s = 0xff; // Full Saturation
   b = 0xff; // Full Brightness
 }
