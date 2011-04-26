@@ -9,6 +9,9 @@
 byte blinkm_addr = 0x09;
 int h, s, b;
 
+//--- Other globals
+float max_mag = 9.0;
+
 //--- Function to read in float
 float readFloatFromBytes() {
   union u_tag {
@@ -32,7 +35,7 @@ void setColor(float val)
   // Because we want lower magnitude to be Blue
   // and the higher magnitude to be Red we must
   // reverse the values.  Thus the following equation.
-  h = int(170.0 * (1.0 - val/9.0));
+  h = int(170.0 * (1.0 - val/max_mag));
   s = 0xff; // Full Saturation
   b = 0xff; // Full Brightness
 }
@@ -40,6 +43,16 @@ void setColor(float val)
 //--- Set the shakr
 void shake(float val)
 {
+  // Fix the limits of val between 0.0 and max_mag
+  if(val < 0.0)
+  {
+    val = 0.0;
+  }
+  else if(val > max_mag)
+  {
+    val = max_mag;
+  }
+
   // Turn on the lights and motors
   digitalWrite(vibPin, HIGH);
   digitalWrite(ledPin, HIGH);
@@ -70,7 +83,7 @@ void setup()
   BlinkM_stopScript(blinkm_addr);
   
   // Color Startup
-  for(float i = 0.0; i <= 9.0; i=i+0.01){
+  for(float i = 0.0; i <= max_mag; i=i+0.01){
     setColor(i);
     BlinkM_fadeToHSB(blinkm_addr, h, s, b);
     delay(2);
