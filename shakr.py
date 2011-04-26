@@ -110,6 +110,7 @@ if __name__ == '__main__':
 		if DEBUG: pprint.pprint(events)
 		
 		if len(feed.entries):
+			feed.entries.reverse()
 			for entry in feed.entries:
 				if DEBUG: pprint.pprint(entry)
 
