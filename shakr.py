@@ -96,7 +96,7 @@ if __name__ == '__main__':
 	# Connect to serial port and wait for arduino reboot and startup
 	try:
 		ser = serial.Serial(PORT,BAUD,timeout=TIMEOUT)
-		time.sleep(5.0)
+		time.sleep(10.0)
 	except serial.SerialException, e:
 		print 'Serial connection could not be established:\n\t',e
 		sys.exit()

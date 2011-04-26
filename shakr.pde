@@ -38,7 +38,7 @@ void setColor(float val)
 }
 
 //--- Set the shakr
-void shake(int val)
+void shake(float val)
 {
   // Turn on the lights and motors
   digitalWrite(vibPin, HIGH);
